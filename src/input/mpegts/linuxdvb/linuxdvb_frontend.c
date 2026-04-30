@@ -2064,6 +2064,19 @@ linuxdvb_frontend_wizard_set( tvh_input_t *ti, htsmsg_t *conf, const char *lang 
 
   if (LIST_FIRST(&lfe->mi_mux_active))
     return;
+
+  //DMC April 2026.
+  //If ntype does not represent a valid type, the 'mpegts_network_wizard_create' function
+  //fails quietly and does not create a network.
+  //nlist will be null which eventually causes a segmentation fault
+  //in 'mpegts_input_set_networks'.
+  //'mpegts_input_set_networks' has been updated to fail gracefully, however,
+  //there is currently no way to signal the failure back to the calling function.
+  //When this silent failure occurs, the user will see an
+  //empty 'Predefined Muxes' dialogue in the Setup Wizard
+  //with the following existing warning:
+  //If you don't see any options below, you need to go back and assign a network type to a tuner.
+
   mpegts_network_wizard_create(ntype, &nlist, lang);
   mn = linuxdvb_frontend_wizard_network(lfe);
   if (ntype && (mn == NULL || mn->mn_wizard)) {

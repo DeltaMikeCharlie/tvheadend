@@ -2220,6 +2220,14 @@ mpegts_input_del_network ( mpegts_network_link_t *mnl )
 int
 mpegts_input_set_networks ( mpegts_input_t *mi, htsmsg_t *msg )
 {
+
+  //Protect against null pointers.  If msg is null, a segmentation fault will occur.
+  if(!mi || !msg)
+  {
+    tvherror(LS_MPEGTS, "'mpegts_input_set_networks' exiting.  Null pointer(s) detected: %p/%p.", mi, msg);
+    return 0;
+  }
+
   int save = 0;
   const char *str;
   htsmsg_field_t *f;
